@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rabbitmq-orthopaedic-department.iml" filepath="$PROJECT_DIR$/.idea/modules/rabbitmq-orthopaedic-department.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rabbitmq-orthopaedic-department_main.iml" filepath="$PROJECT_DIR$/.idea/modules/rabbitmq-orthopaedic-department_main.iml" group="rabbitmq-orthopaedic-department" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rabbitmq-orthopaedic-department_test.iml" filepath="$PROJECT_DIR$/.idea/modules/rabbitmq-orthopaedic-department_test.iml" group="rabbitmq-orthopaedic-department" />
+    </modules>
+  </component>
+</project>
