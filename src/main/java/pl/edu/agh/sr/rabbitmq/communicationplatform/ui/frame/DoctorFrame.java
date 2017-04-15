@@ -14,7 +14,7 @@ public class DoctorFrame extends EmployeeFrame implements ActionListener {
         super(doctor);
         setSize(600, 400);
 
-        initLayout();
+        initLayout(10, 10, 580, 270);
 
         JLabel typeLabel = new JLabel("type");
         typeLabel.setBounds(12, 300, 48, 15);
@@ -54,9 +54,5 @@ public class DoctorFrame extends EmployeeFrame implements ActionListener {
                 ((DoctorThread) employee).orderTest(type, patient);
             }
         }
-    }
-
-    public void printMessage(String message) {
-        textArea.append(message + "\n");
     }
 }

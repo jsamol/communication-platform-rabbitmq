@@ -1,40 +1,51 @@
 package pl.edu.agh.sr.rabbitmq.communicationplatform.employees;
 
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.Department;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.ui.frame.DoctorFrame;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 public class DoctorThread extends EmployeeThread {
-    private DoctorFrame ui;
 
     public DoctorThread(Department department, String name) {
         super(department);
         this.setName(name);
+        specializations.addAll(Arrays.asList(Department.getSpecializations()));
     }
 
     @Override
     public void run() {
         ui = new DoctorFrame(this);
-        department.log(this.getName() + " started working.");
-
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        init();
+        Consumer consumer = new DefaultConsumer(channel) {
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope,
+                                       AMQP.BasicProperties properties, byte[] body) throws IOException {
+                String message = new String(body, "UTF-8");
+                ui.printMessage("type \"" + envelope.getRoutingKey() + "\": " + message);
+            }
+        };
         try {
-            Connection connection = factory.newConnection();
-        } catch (Exception e) {
+            channel.basicConsume(queueName, true, consumer);
+        } catch (IOException e) {
             department.log(
-                    "<< " + this.getName() + " | error while creating new connection (Exception caught: " + e + "). >>"
+                    "<< " + this.getName() + " | error while setting consumer (Exception caught: " + e + "). >>"
             );
         }
     }
 
-    @Override
-    public void interrupt() {
-        department.log(this.getName() + " finished working.\n");
-    }
-
     public void orderTest(String type, String patient) {
-
+        try {
+            channel.basicPublish(EXCHANGE_NAME, type, null, patient.getBytes());
+        } catch (IOException e) {
+            department.log(
+                    "<< " + this.getName() + " | error while ordering a test (Exception caught: " + e + "). >>"
+            );
+        }
     }
 }

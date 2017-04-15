@@ -24,13 +24,13 @@ public class Department {
         administrator = new Administrator("Administrator");
 
         for (int i = 0; i < doctorsNum; i++) {
-            DoctorThread newDoctor = new DoctorThread(this, "DoctorThread #" + i);
+            DoctorThread newDoctor = new DoctorThread(this, "Doctor #" + i);
             newDoctor.start();
             employees.add(newDoctor);
         }
 
         for (int i = 0; i < techniciansNum; i++) {
-            TechnicianThread newTechnician = new TechnicianThread(this, "TechnicianThread #" + i);
+            TechnicianThread newTechnician = new TechnicianThread(this, "Technician #" + i);
             newTechnician.start();
             employees.add(newTechnician);
         }

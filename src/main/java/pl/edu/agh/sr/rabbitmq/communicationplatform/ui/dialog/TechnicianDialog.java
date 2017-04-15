@@ -1,7 +1,8 @@
 package pl.edu.agh.sr.rabbitmq.communicationplatform.ui.dialog;
 
 import pl.edu.agh.sr.rabbitmq.communicationplatform.Department;
-import pl.edu.agh.sr.rabbitmq.communicationplatform.ui.frame.EmployeeFrame;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.TechnicianThread;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.ui.frame.TechnicianFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,14 +11,14 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmployeeDialog extends JDialog implements ActionListener {
-    private EmployeeFrame employeeFrame;
+public class TechnicianDialog extends JDialog implements ActionListener {
+    private TechnicianFrame technicianFrame;
 
     private List<JCheckBox> checkBoxList;
 
-    public EmployeeDialog(JFrame parent) {
+    public TechnicianDialog(JFrame parent) {
         super(parent, true);
-        this.employeeFrame = (EmployeeFrame) parent;
+        this.technicianFrame = (TechnicianFrame) parent;
         setTitle("Select specialization");
         checkBoxList = new ArrayList<>();
         setLocationRelativeTo(null);
@@ -58,7 +59,7 @@ public class EmployeeDialog extends JDialog implements ActionListener {
                     specializations.add(checkBox.getText());
                 }
             }
-            employeeFrame.setSpecializations(specializations);
+            technicianFrame.setSpecializations(specializations);
             setVisible(false);
         }
     }
