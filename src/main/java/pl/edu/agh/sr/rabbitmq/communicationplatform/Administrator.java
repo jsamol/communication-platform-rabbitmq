@@ -1,4 +1,4 @@
-package pl.edu.agh.sr.rabbitmq.communicationplatform.worker;
+package pl.edu.agh.sr.rabbitmq.communicationplatform;
 
 public class Administrator extends Thread {
 

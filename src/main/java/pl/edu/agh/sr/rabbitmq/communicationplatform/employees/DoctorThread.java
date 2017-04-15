@@ -1,23 +1,22 @@
-package pl.edu.agh.sr.rabbitmq.communicationplatform.worker;
+package pl.edu.agh.sr.rabbitmq.communicationplatform.employees;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.Department;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.ui.frame.DoctorFrame;
 
-import java.util.List;
+public class DoctorThread extends EmployeeThread {
+    private DoctorFrame ui;
 
-public class Doctor extends Thread {
-    private Department department;
-    private List<String> specializations;
-
-    public Doctor(Department department, String name, String... specialization) {
-        this.department = department;
+    public DoctorThread(Department department, String name) {
+        super(department);
         this.setName(name);
     }
 
     @Override
     public void run() {
-        department.log(this.getName() + " started working.\n");
+        ui = new DoctorFrame(this);
+        department.log(this.getName() + " started working.");
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -25,7 +24,7 @@ public class Doctor extends Thread {
             Connection connection = factory.newConnection();
         } catch (Exception e) {
             department.log(
-                    "<<" + this.getName() + "| error while creating new connection (Exception caught: " + e + ").>>\n"
+                    "<< " + this.getName() + " | error while creating new connection (Exception caught: " + e + "). >>"
             );
         }
     }
@@ -33,5 +32,9 @@ public class Doctor extends Thread {
     @Override
     public void interrupt() {
         department.log(this.getName() + " finished working.\n");
+    }
+
+    public void orderTest(String type, String patient) {
+
     }
 }
