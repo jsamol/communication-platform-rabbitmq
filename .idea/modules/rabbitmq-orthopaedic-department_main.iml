@@ -12,5 +12,6 @@
     <orderEntry type="library" name="Gradle: com.rabbitmq:amqp-client:4.1.0" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
   </component>
 </module>

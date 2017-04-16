@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 public class EmployeeThread extends Thread {
-    final String EXCHANGE_NAME = "testExchange";
     List<String> specializations;
-    String queueName;
 
     EmployeeFrame ui;
 
@@ -21,8 +19,10 @@ public class EmployeeThread extends Thread {
     private Connection connection;
     Channel channel;
 
-    EmployeeThread(Department department) {
+    EmployeeThread(Department department, String name) {
         this.department = department;
+        this.setName(name);
+
         specializations = new ArrayList<>();
     }
 
@@ -32,12 +32,9 @@ public class EmployeeThread extends Thread {
         factory.setHost("localhost");
         try {
             connection = factory.newConnection();
-            Channel channel = connection.createChannel();
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
-
-            queueName = channel.queueDeclare().getQueue();
+            channel = connection.createChannel();
             for (String specialization : specializations) {
-                channel.queueBind(queueName, EXCHANGE_NAME, specialization);
+                channel.queueDeclare(specialization, true, false, false, null);
             }
         } catch (Exception e) {
             department.log(

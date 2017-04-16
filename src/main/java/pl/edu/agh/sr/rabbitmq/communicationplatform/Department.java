@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Department {
-    private static final int doctorsNum = 1;
-    private static final int techniciansNum = 1;
+    private static final int doctorsNum = 2;
+    private static final int techniciansNum = 2;
 
     private static final String[] specializations = {"knee", "ankle", "elbow"};
 

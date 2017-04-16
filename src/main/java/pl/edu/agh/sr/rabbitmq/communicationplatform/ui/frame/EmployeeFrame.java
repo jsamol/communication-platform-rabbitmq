@@ -38,7 +38,7 @@ public class EmployeeFrame extends JFrame {
     }
 
     public void printMessage(String message) {
-        textArea.append(message);
+        textArea.append(message + "\n");
     }
 
     private void exit() {
