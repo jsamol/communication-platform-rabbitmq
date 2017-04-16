@@ -11,7 +11,7 @@ public class Department {
     private static final int doctorsNum = 2;
     private static final int techniciansNum = 2;
 
-    private static final String[] specializations = {"knee", "ankle", "elbow"};
+    public static final String[] specializations = {"knee", "ankle", "elbow"};
 
     private List<EmployeeThread> employees;
     private Administrator administrator;
@@ -22,6 +22,7 @@ public class Department {
 
     private void init() {
         administrator = new Administrator("Administrator");
+        administrator.start();
 
         for (int i = 0; i < doctorsNum; i++) {
             DoctorThread newDoctor = new DoctorThread(this, "Doctor #" + i);
@@ -57,9 +58,5 @@ public class Department {
 
     public void log(String log) {
         administrator.log(log);
-    }
-
-    public static String[] getSpecializations() {
-        return specializations;
     }
 }

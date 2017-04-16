@@ -36,7 +36,7 @@ public class TechnicianDialog extends JDialog implements ActionListener {
         panel.setLayout(new GridLayout(3, 1));
         add(panel);
 
-        for (String specialization : Department.getSpecializations()) {
+        for (String specialization : Department.specializations) {
             JCheckBox checkBox = new JCheckBox(specialization);
             checkBox.setSelected(false);
             checkBoxList.add(checkBox);

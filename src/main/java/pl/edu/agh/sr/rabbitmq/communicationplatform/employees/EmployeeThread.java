@@ -1,6 +1,7 @@
 package pl.edu.agh.sr.rabbitmq.communicationplatform.employees;
 
 import com.rabbitmq.client.*;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.Administrator;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.Department;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.ui.frame.EmployeeFrame;
 
@@ -36,11 +37,34 @@ public class EmployeeThread extends Thread {
             for (String specialization : specializations) {
                 channel.queueDeclare(specialization, true, false, false, null);
             }
+            channel.exchangeDeclare(Administrator.EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
+            String infoQueueName = channel.queueDeclare().getQueue();
+            channel.queueBind(infoQueueName, Administrator.EXCHANGE_NAME, "");
+
+            channel.queueDeclare(Administrator.LOG_QUEUE_NAME, true,
+                    false, false, null);
+
+            Consumer consumer = new DefaultConsumer(channel) {
+
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope,
+                                           AMQP.BasicProperties properties, byte[] body)
+                        throws IOException {
+                    String message = new String(body, "UTF-8");
+                    ui.printMessage("! Admin info: " + message);
+                }
+            };
+
+            channel.basicConsume(infoQueueName, true, consumer);
         } catch (Exception e) {
             department.log(
                     "<< " + this.getName() + " | error while creating new connection (Exception caught: " + e + "). >>"
             );
         }
+    }
+
+    void log(String log) throws IOException {
+        channel.basicPublish("", Administrator.LOG_QUEUE_NAME, null, log.getBytes());
     }
 
     @Override

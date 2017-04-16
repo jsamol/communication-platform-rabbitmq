@@ -16,7 +16,7 @@ public class DoctorThread extends EmployeeThread {
 
     public DoctorThread(Department department, String name) {
         super(department, name);
-        specializations.addAll(Arrays.asList(Department.getSpecializations()));
+        specializations.addAll(Arrays.asList(Department.specializations));
         testOrders = new ArrayList<>();
     }
 
@@ -32,7 +32,8 @@ public class DoctorThread extends EmployeeThread {
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope,
-                                           AMQP.BasicProperties properties, byte[] body) throws IOException {
+                                           AMQP.BasicProperties properties, byte[] body)
+                        throws IOException {
                     if (testOrders.contains(properties.getCorrelationId())) {
                         String message = new String(body, "UTF-8");
                         ui.printMessage(message);
@@ -63,6 +64,7 @@ public class DoctorThread extends EmployeeThread {
 
             String message = getName() + "&" + patient;
             channel.basicPublish("", type, props, message.getBytes());
+            log("Log << [" + getName() + "] " + message + " >>");
             ui.printMessage("> Ordered test, type: " + type + ", patient: " + patient + ", test ID: " + corrID);
         } catch (IOException e) {
             department.log(

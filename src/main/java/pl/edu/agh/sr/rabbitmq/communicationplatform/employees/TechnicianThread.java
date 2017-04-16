@@ -23,7 +23,8 @@ public class TechnicianThread extends EmployeeThread {
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope,
-                                           AMQP.BasicProperties properties, byte[] body) throws IOException {
+                                           AMQP.BasicProperties properties, byte[] body)
+                        throws IOException {
                     String message = new String(body, "UTF-8");
                     String[] messageArray = message.split("&");
                     ui.printMessage(
@@ -66,6 +67,7 @@ public class TechnicianThread extends EmployeeThread {
     private void sendTestResult(String replyTo, AMQP.BasicProperties props, String message) {
         try {
             channel.basicPublish("", replyTo, props, message.getBytes());
+            log("Log << [" + getName() + "] " + message + " >>");
         } catch (IOException e) {
             department.log(
                     "<< " + this.getName() + " | error while sending results (Exception caught: " + e + "). >>"
