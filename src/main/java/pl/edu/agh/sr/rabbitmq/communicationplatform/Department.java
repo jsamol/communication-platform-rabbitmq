@@ -4,24 +4,24 @@ import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.DoctorThread;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.EmployeeThread;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.TechnicianThread;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Department {
-    private static final int doctorsNum = 2;
-    private static final int techniciansNum = 2;
+    private static final int doctorsNum = 1;
+    private static final int techniciansNum = 0;
 
     public static final String[] specializations = {"knee", "ankle", "elbow"};
 
-    private List<EmployeeThread> employees;
+    private BlockingQueue<EmployeeThread> employees;
     private Administrator administrator;
 
     private Department() {
-        employees = new ArrayList<>();
+        employees = new LinkedBlockingQueue<>();
     }
 
     private void init() {
-        administrator = new Administrator("Administrator");
+        administrator = new Administrator(this, "Administrator");
         administrator.start();
 
         for (int i = 0; i < doctorsNum; i++) {
@@ -41,7 +41,6 @@ public class Department {
         for (EmployeeThread employee : employees) {
             employee.join();
         }
-
         administrator.join();
     }
 
@@ -51,12 +50,16 @@ public class Department {
 
         try {
             department.waitForEmployees();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (InterruptedException ignored) {
+
         }
     }
 
     public void log(String log) {
         administrator.log(log);
+    }
+
+    public BlockingQueue<EmployeeThread> getEmployees() {
+        return employees;
     }
 }

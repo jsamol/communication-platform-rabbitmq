@@ -14,10 +14,9 @@ public class EmployeeFrame extends JFrame {
     EmployeeFrame(EmployeeThread employee) {
         super(employee.getName());
         this.employee = employee;
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 exit();
             }
         });

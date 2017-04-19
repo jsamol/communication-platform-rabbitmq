@@ -1,6 +1,9 @@
 package pl.edu.agh.sr.rabbitmq.communicationplatform;
 
 import com.rabbitmq.client.*;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.DoctorThread;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.EmployeeThread;
+import pl.edu.agh.sr.rabbitmq.communicationplatform.employees.TechnicianThread;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,10 +13,14 @@ import java.util.concurrent.TimeoutException;
 public class Administrator extends Thread {
     public static final String EXCHANGE_NAME = "info";
     public static final String LOG_QUEUE_NAME = "log";
+
+    private Department department;
+
     private Connection connection;
     private Channel channel;
 
-    Administrator(String name) {
+    Administrator(Department department, String name) {
+        this.department = department;
         this.setName(name);
     }
 
@@ -48,11 +55,48 @@ public class Administrator extends Thread {
             );
             try {
                 String message = input.readLine();
-                channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes());
+                if (message.startsWith("\\r doctor")) {
+                    String name = message.substring(10);
+                    if (!checkIfAlreadyRunning(name)) {
+                        DoctorThread newDoctor = new DoctorThread(department, name);
+                        newDoctor.start();
+                        department.getEmployees().add(newDoctor);
+                    }
+                }
+                else if (message.startsWith("\\r technician")) {
+                    String name = message.substring(14);
+                    if(!checkIfAlreadyRunning(name)) {
+                        TechnicianThread newTechnician = new TechnicianThread(department, name);
+                        newTechnician.start();
+                        department.getEmployees().add(newTechnician);
+                    }
+                }
+                else if ("\\exit".equals(message)) {
+                    for (EmployeeThread employee : department.getEmployees()) {
+                        if (!employee.isInterrupted()) {
+                            employee.interrupt();
+                        }
+                    }
+                    exit();
+                    System.exit(0);
+                }
+                else {
+                    channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes());
+                }
             } catch (IOException e) {
                 log("<< Error while sending message (Exception caught: " + e + "). >>");
             }
         }
+    }
+
+    private boolean checkIfAlreadyRunning(String name) {
+        for (EmployeeThread employee : department.getEmployees()) {
+            if (employee.getName().equals(name)) {
+                log("<< " + name + " is already working >>");
+                return true;
+            }
+        }
+        return false;
     }
 
     void log(String log) {
@@ -61,6 +105,15 @@ public class Administrator extends Thread {
 
     @Override
     public void interrupt() {
+        super.interrupt();
+        log("Administrator interrupted.");
+        for (EmployeeThread employee : department.getEmployees()) {
+            employee.interrupt();
+        }
+        exit();
+    }
+
+    private void exit() {
         try {
             channel.close();
             connection.close();

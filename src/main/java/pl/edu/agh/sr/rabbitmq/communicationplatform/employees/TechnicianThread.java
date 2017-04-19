@@ -68,6 +68,7 @@ public class TechnicianThread extends EmployeeThread {
         try {
             channel.basicPublish("", replyTo, props, message.getBytes());
             log("Log << [" + getName() + "] " + message + " >>");
+            ui.printMessage("> Sent results: " + message);
         } catch (IOException e) {
             department.log(
                     "<< " + this.getName() + " | error while sending results (Exception caught: " + e + "). >>"

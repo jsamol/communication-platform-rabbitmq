@@ -19,6 +19,7 @@ public class EmployeeThread extends Thread {
 
     private Connection connection;
     Channel channel;
+    private Channel infoChannel;
 
     EmployeeThread(Department department, String name) {
         this.department = department;
@@ -34,14 +35,15 @@ public class EmployeeThread extends Thread {
         try {
             connection = factory.newConnection();
             channel = connection.createChannel();
+            infoChannel = connection.createChannel();
             for (String specialization : specializations) {
                 channel.queueDeclare(specialization, true, false, false, null);
             }
             channel.exchangeDeclare(Administrator.EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
-            String infoQueueName = channel.queueDeclare().getQueue();
-            channel.queueBind(infoQueueName, Administrator.EXCHANGE_NAME, "");
+            String infoQueueName = infoChannel.queueDeclare().getQueue();
+            infoChannel.queueBind(infoQueueName, Administrator.EXCHANGE_NAME, "");
 
-            channel.queueDeclare(Administrator.LOG_QUEUE_NAME, true,
+            infoChannel.queueDeclare(Administrator.LOG_QUEUE_NAME, true,
                     false, false, null);
 
             Consumer consumer = new DefaultConsumer(channel) {
@@ -55,7 +57,7 @@ public class EmployeeThread extends Thread {
                 }
             };
 
-            channel.basicConsume(infoQueueName, true, consumer);
+            infoChannel.basicConsume(infoQueueName, true, consumer);
         } catch (Exception e) {
             department.log(
                     "<< " + this.getName() + " | error while creating new connection (Exception caught: " + e + "). >>"
@@ -64,11 +66,13 @@ public class EmployeeThread extends Thread {
     }
 
     void log(String log) throws IOException {
-        channel.basicPublish("", Administrator.LOG_QUEUE_NAME, null, log.getBytes());
+        infoChannel.basicPublish("", Administrator.LOG_QUEUE_NAME, null, log.getBytes());
     }
 
     @Override
     public void interrupt() {
+        super.interrupt();
+        department.getEmployees().remove(this);
         department.log(this.getName() + " finished working.\n");
         try {
             channel.close();

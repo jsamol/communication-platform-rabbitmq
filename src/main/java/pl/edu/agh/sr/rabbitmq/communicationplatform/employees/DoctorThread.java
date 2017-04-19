@@ -5,19 +5,15 @@ import pl.edu.agh.sr.rabbitmq.communicationplatform.Department;
 import pl.edu.agh.sr.rabbitmq.communicationplatform.ui.frame.DoctorFrame;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class DoctorThread extends EmployeeThread {
-    private List<String> testOrders;
     private String callbackQueueName;
 
     public DoctorThread(Department department, String name) {
         super(department, name);
         specializations.addAll(Arrays.asList(Department.specializations));
-        testOrders = new ArrayList<>();
     }
 
     @Override
@@ -34,10 +30,10 @@ public class DoctorThread extends EmployeeThread {
                 public void handleDelivery(String consumerTag, Envelope envelope,
                                            AMQP.BasicProperties properties, byte[] body)
                         throws IOException {
-                    if (testOrders.contains(properties.getCorrelationId())) {
+                    if (properties != null && properties.getCorrelationId() != null
+                            && properties.getCorrelationId().startsWith(getName())) {
                         String message = new String(body, "UTF-8");
                         ui.printMessage(message);
-                        testOrders.remove(properties.getCorrelationId());
                     }
                 }
             };
@@ -52,9 +48,7 @@ public class DoctorThread extends EmployeeThread {
 
     public void orderTest(String type, String patient) {
         try {
-            String corrID = UUID.randomUUID().toString();
-
-            testOrders.add(corrID);
+            String corrID = getName() + UUID.randomUUID().toString();
 
             AMQP.BasicProperties props = new AMQP
                     .BasicProperties.Builder()
